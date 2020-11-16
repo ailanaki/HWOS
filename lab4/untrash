@@ -1,0 +1,45 @@
+#!/bin/bash
+read file
+IFS=$'\n'
+name=""
+str=""
+if [[ -z $(cat "$HOME/.trash.log") ]];
+then echo "nothing in trash"; exit;
+fi
+for i in $(cat "$HOME/.trash.log");do
+	name=$(echo $i|awk "/$file/ {print \$1}")
+	if [[ -n  $name ]];
+	then
+		echo "$name"
+		read answer
+                str=$i
+		if [[ "$answer" == "y" ]]; then
+                        next=$(echo $i| awk '{print $2}'); break
+		fi
+	fi
+done
+if [[ -z $next ]]
+then echo "this file not in trash"; exit;
+fi
+dir=$(dirname "$name")
+if [[ -e "$dir" ]];
+then
+	while [ -e "$name"/"$file" ];
+	do
+		echo "file with this name already exist, please change name"
+		read file
+	done;
+	ln $next "$dir"/"$file"
+else
+	echo "file will be created in home directiry"
+	while [ -e "$HOME"/"$file" ];
+        do
+                echo "file with this name already exist, please change name"
+                read file
+        done;
+	ln $next  "$HOME"/"$file"
+fi
+cat $HOME/.trash.log| awk -e "{ if (\$0 != \"$str\") print \$0 }" > tmp
+cat tmp > $HOME/.trash.log
+rm tmp
+rm $next

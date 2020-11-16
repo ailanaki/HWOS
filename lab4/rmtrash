@@ -1,0 +1,22 @@
+#!/bin/bash
+read file
+ffile=$(find . -maxdepth 1 -name "$file")
+if [[ -z "$ffile" ]]
+then echo "file don't exist"; exit;
+fi;
+dir=$(find $HOME -maxdepth 1 -name ".trash")
+if [[ -z "$dir" ]]
+then mkdir "$HOME/.trash";
+let n=1;
+else
+let n=$(ls "$HOME/.trash" |tail -n 1)+1;
+fi;
+ln $file "$HOME/.trash/$n" ||  {
+		echo "can't create hardlink"
+		exit
+		}
+rm $file|| {
+	   echo "can't delete file"
+	   exit
+  	   }
+echo "$PWD/$file" "$HOME/.trash/$n" >> $HOME/.trash.log

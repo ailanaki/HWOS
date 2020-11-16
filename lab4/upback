@@ -1,0 +1,6 @@
+#!/bin/bash
+last_date=$(ls -d /home/aisha/*/|awk -F '-' '/Backup/{print $2"-"$3"-"$4}'| sort -r -nk1,3|head -n 1| tr -d /)
+for i in $(find /home/aisha/Backup-$last_date -type f -not -name "*.[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"); do
+	tmp=$(basename "$i")
+	cp "$i" /home/aisha/restore/"$tmp"
+done

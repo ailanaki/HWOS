@@ -1,0 +1,42 @@
+#!/bin/bash
+last_date=$(ls -d /home/aisha/*/|awk -F '-' '/Backup/{print $2"-"$3"-"$4}'| sort -r -nk1,3|head -n 1| tr -d /)
+dir=true
+for i in 0 1 2 3 4 5 6 7; do
+	date=$(date +%F --date="$i days ago")
+	if [[ $date == $last_date ]];then
+		dir=false
+	fi
+done
+date=$(date +%F)
+if [[ $dir == true ]];then
+	mkdir  /home/aisha/Backup-$date
+	for i in $(ls -1 /home/aisha/source);do
+		cp /home/aisha/source/"$i" /home/aisha/Backup-$date/"$i"
+	done
+	echo "create new catalog /home/aisha/Backup-$date : /home/aisha/source">>/home/aisha/backup-report
+	ls -1 /home/aisha/Backup-$date >>  /home/aisha/backup-report
+else
+	touch tmp1
+	touch tmp2
+	for i in $(ls -1 /home/aisha/source); do
+		back_dir=/home/aisha/Backup-$last_date
+		k=$(ls -1 $back_dir|awk "{ if (\"$i\" == \$0 ) print \$0 }")
+		if [[ -z "$k" ]];then
+			cp /home/aisha/source/"$i" $back_dir/"$i"
+			echo "$i" >> tmp1
+		else
+			if [[ $(du -h $back_dir/"$i"| awk '{print $1}') !=  $(du -h /home/aisha/source/"$i"| awk '{print $1}') ]]; then
+				 cp $back_dir/"$i"  > $back_dir/"$i".$date
+				 cp /home/aisha/source/"$i" > $back_dir/"$i"
+				echo "$i $i.$date" >> tmp2
+			fi
+		fi
+	done
+	echo "change catalog $back_dir, date :$date" >> /home/aisha/backup-report
+	cat tmp1 >> /home/aisha/backup-report
+	cat tmp2 >> /home/aisha/backup-report
+	rm tmp1
+	rm tmp2
+
+fi
+
