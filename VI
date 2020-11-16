@@ -1,0 +1,37 @@
+#!/bin/bash
+echo $$ > .pid
+a=1
+MODE="+"
+plus()
+{
+	MODE="p"
+}
+mul()
+{
+	MODE="m"
+}
+sig(){
+	MODE="s"
+}
+trap 'plus' USR1
+trap 'mul' USR2
+trap 'sig' SIGTERM
+
+while true; do
+	case $MODE in
+		p)
+			let a=a+2
+			echo $a
+			MODE="NOTHING"
+			;;
+		m)
+			let a=a*2
+			echo $a
+			MODE="NOTHING"
+			;;
+		s)
+			echo "END: Another process signal"
+			exit
+			;;
+	esac
+done

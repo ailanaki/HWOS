@@ -1,0 +1,13 @@
+#!/bin/bash
+./IVa &
+pid1=$!
+./IVa &
+pid2=$!
+./IVa &
+pid3=$!
+echo $pid1
+cpulimit --pid=$pid1 --limit=10
+sleep 5
+kill $pid3
+sleep 5
+killall IVa

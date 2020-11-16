@@ -1,0 +1,10 @@
+#!/bin/bash
+data=$(date|awk '{print $2"_"$3"_"$4"_"$5}')
+mkdir ~/test 2>/dev/null && { 
+	echo "catalog test was created successfully" > ~/report
+	touch ~/test/$data
+}
+ping www.net_nikogo.ru/ 2>/dev/null || {
+	date >> ~/report
+	echo "Unsuccessful ping" >> ~/report
+}

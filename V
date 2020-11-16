@@ -1,0 +1,54 @@
+#!/bin/bash
+a=1
+MODE="+"
+(tail -f pipe)|
+while true; do
+        case $MODE in
+		"+")
+			read b
+			case $b in
+				"*")
+					MODE="*"
+					;;
+				"+")
+					;;
+				QUIT)
+					MODE="q"
+					;;
+
+				*)
+					let a=a+b 2>>/dev/null|| MODE="WRONG"
+					;;
+				esac
+			;;
+		"*")
+                        read b
+                        case $b in
+                                "+")
+                                        MODE="+"
+                                        ;;
+                                "*")
+                                        ;;
+				QUIT)
+					MODE="q"
+					;;
+                                *)
+                                        let a=a*b 2>>/dev/null|| MODE="WRONG"
+					;;
+                                esac
+                        ;;
+		q)
+			killall Vgen
+			killall tail
+			exit
+			;;
+
+		WRONG)
+			echo "WRONG INPUT"
+			killall Vgen
+			killall tail
+			exit
+			;;
+	esac
+	echo $a
+done

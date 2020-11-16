@@ -1,0 +1,4 @@
+#!/bin/bash
+./I 
+tail -f ~/report | awk '{print $0}' &
+

@@ -1,0 +1,47 @@
+#!/bin/bash
+echo $$ > .pid
+plus()
+{
+        MODE="p"
+}
+mul()
+{
+        MODE="m"
+}
+sig(){
+      	MODE="s"
+}
+trap 'plus' USR1
+trap 'mul' USR2
+trap 'sig' SIGTERM
+
+wrong=false
+let a=0
+MODE="NOTHING"
+while true; do
+	case $MODE in
+                p)
+			b=$(tail -n 1 pipe)
+                  	let a=a+$b 2>>/dev/null || wrong=true 
+                        echo $a
+                        MODE="NOTHING"
+                        ;;
+                m)
+			b=$(tail -n 1 pipe)
+                  	let a=a*$b 2>>/dev/null ||wrong=true
+                        echo $a
+                        MODE="NOTHING"
+                        ;;
+                s)
+                  	echo "END: Another process signal"
+                        exit
+                        ;;
+        esac
+	if [[ wrong == true ]];then
+		echo "WRONG INPUT"
+		killall VIIgen
+		killall tail
+		exit;
+	fi
+done
+
